@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Player One | Personal Website</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN TOKENS (light default, dark via theme) ===== */
+:root{--bg:#f6f7fb;--sf:#ffffff;--tx:#14182b;--mu:#4a5170;--ac:#007a5a;--ac2:#b0127f;--bd:#d8dcef;--gl:rgba(0,122,90,.18);
+--h:'Space Grotesk',system-ui,sans-serif;--b:'Inter',system-ui,sans-serif;--m:'JetBrains Mono',ui-monospace,monospace;--e:cubic-bezier(.2,.8,.2,1)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0d17;--sf:#151a2e;--tx:#e8ecff;--mu:#a3abd0;--ac:#7cf5c8;--ac2:#ff6bd6;--bd:#2a3150;--gl:rgba(124,245,200,.22)}}
+:root[data-theme="dark"]{--bg:#0b0d17;--sf:#151a2e;--tx:#e8ecff;--mu:#a3abd0;--ac:#7cf5c8;--ac2:#ff6bd6;--bd:#2a3150;--gl:rgba(124,245,200,.22)}
+*{box-sizing:border-box;margin:0}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+body{background:var(--bg);color:var(--tx);font:400 1rem/1.6 var(--b);overflow-x:hidden;
+background-image:linear-gradient(var(--bd) 1px,transparent 1px),linear-gradient(90deg,var(--bd) 1px,transparent 1px);background-size:48px 48px;background-attachment:fixed}
+body::after{content:"";position:fixed;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,30%),var(--gl),transparent 280px);pointer-events:none;z-index:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+main,footer{position:relative;z-index:1}
+h1,h2,h3{font-family:var(--h);line-height:1.1}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ac2);outline-offset:3px;border-radius:8px}
+.sr{position:absolute;left:-9999px}
+section{max-width:1000px;margin:auto;padding:90px 20px 30px}
+h2{font-size:clamp(1.6rem,4vw,2.3rem);margin-bottom:6px}
+.sub{color:var(--mu);margin-bottom:24px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;box-shadow:0 8px 30px var(--gl)}
+.btn{min-height:48px;padding:0 26px;border-radius:999px;border:0;background:var(--ac);color:var(--bg);font:700 1rem var(--h);cursor:pointer;transition:transform .2s var(--e),box-shadow .2s var(--e)}
+.btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 28px var(--ac)}
+.btn.ghost{background:transparent;color:var(--tx);border:2px solid var(--bd)}
+
+/* ===== HUD ===== */
+#hud{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 14px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);font:500 .8rem var(--m)}
+#hud nav{display:flex;gap:4px}
+#hud nav a{text-decoration:none;padding:12px 10px;min-height:44px;border-radius:8px;color:var(--mu)}
+#hud nav a:hover{color:var(--ac);background:var(--gl)}
+.meter{display:flex;align-items:center;gap:8px}
+.bar{width:90px;height:10px;border-radius:9px;background:var(--bd);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .6s var(--e)}
+.ic{min-width:44px;min-height:44px;border-radius:50%;border:1px solid var(--bd);background:var(--sf);color:var(--tx);cursor:pointer;font-size:1.1rem}
+@media(max-width:600px){#hud nav{display:none}.bar{width:60px}}
+
+/* ===== HERO ===== */
+#hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:22px}
+.tag{font:500 .85rem var(--m);color:var(--ac)}
+#hero h1{font-size:clamp(2.2rem,7vw,4.6rem);max-width:15ch}
+.grad{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.cur{display:inline-block;width:.5ch;background:var(--ac);animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pulse{animation:pu 1.8s infinite}
+@keyframes pu{0%{box-shadow:0 0 0 0 var(--ac)}70%{box-shadow:0 0 0 18px transparent}100%{box-shadow:0 0 0 0 transparent}}
+#ring{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;width:64px;height:64px;font:500 .8rem var(--m);display:grid;place-items:center;background:var(--sf);border-radius:50%;border:1px solid var(--bd)}
+#ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+#ring circle{fill:none;stroke-width:4}
+#ring .t{stroke:var(--bd)}#ring .p{stroke:var(--ac);stroke-dasharray:176;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear}
+
+/* ===== PLAYER CARD ===== */
+.grid2{display:grid;gap:22px;grid-template-columns:1fr}
+@media(min-width:960px){.grid2{grid-template-columns:320px 1fr}}
+#photoWrap{perspective:900px}
+#photo{border-radius:16px;overflow:hidden;border:2px solid var(--ac);transition:transform .15s;cursor:pointer;background:var(--sf);position:relative}
+#photo svg,#photo img{display:block;width:100%;height:auto}
+.badge{position:absolute;left:10px;bottom:10px;background:var(--bg);color:var(--ac);font:500 .75rem var(--m);padding:4px 10px;border-radius:99px}
+.badge::before{content:"●";margin-right:6px;animation:bl 1.4s infinite}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.facts div{border:1px solid var(--bd);border-radius:12px;padding:10px}
+.facts b{display:block;font:500 .72rem var(--m);color:var(--ac2)}
+
+/* ===== STATS ===== */
+.stat{margin:14px 0;position:relative}
+.stat label{display:flex;justify-content:space-between;font:500 .85rem var(--m);margin-bottom:5px}
+.track{height:14px;border-radius:9px;background:var(--bd);overflow:hidden}
+.fill{height:100%;width:100%;transform:scaleX(0);transform-origin:left;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:transform 1.2s var(--e)}
+.in .fill{transform:scaleX(var(--v))}
+.stat .tip{position:absolute;right:0;top:-34px;background:var(--tx);color:var(--bg);font-size:.78rem;padding:5px 10px;border-radius:8px;opacity:0;transform:translateY(6px);transition:.2s;pointer-events:none;max-width:90%}
+.stat:hover .tip,.stat:focus-within .tip{opacity:1;transform:none}
+
+/* ===== LOOT CARDS ===== */
+#loot{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.flip{perspective:800px;min-height:190px;background:none;border:0;padding:0;cursor:pointer;color:inherit;font:inherit;text-align:center}
+.flip>div{position:relative;width:100%;height:190px;transform-style:preserve-3d;transition:transform .6s var(--e)}
+.flip.on>div{transform:rotateY(180deg)}
+.flip .f,.flip .k{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:1px solid var(--bd);background:var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px}
+.flip .f span{font-size:2.4rem}.flip .f small{color:var(--ac);font:500 .72rem var(--m)}
+.flip .k{transform:rotateY(180deg);border-color:var(--ac2);font-size:.88rem}
+.flip:hover:not(.on){transform:translateY(-6px)}
+.flip{transition:transform .2s var(--e)}
+
+/* ===== GAME ===== */
+#opts{display:grid;gap:10px}
+.opt{min-height:56px;text-align:left;padding:12px 16px;border-radius:12px;border:2px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;cursor:pointer;transition:.2s}
+.opt:hover:not(:disabled){border-color:var(--ac);transform:translateX(6px)}
+.opt.ok{border-color:var(--ac);background:var(--gl)}.opt.no{border-color:var(--ac2)}
+#res{margin-top:14px;min-height:28px;font-weight:600}
+
+/* ===== TIMELINE ===== */
+.tl{border-left:3px solid var(--bd);margin-left:10px;padding-left:24px}
+.ch{margin-bottom:22px;opacity:0;transform:translateY(24px);transition:.7s var(--e);position:relative}
+.ch.in{opacity:1;transform:none}
+.ch::before{content:"";position:absolute;left:-33px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--ac);box-shadow:0 0 12px var(--ac)}
+.ch small{font:500 .78rem var(--m);color:var(--ac2)}
+
+/* ===== CONTACT ===== */
+.links{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.links a,.links button{display:flex;align-items:center;gap:10px;min-height:56px;padding:0 18px;border-radius:14px;border:1px solid var(--bd);background:var(--sf);text-decoration:none;color:var(--tx);font:600 .95rem var(--b);cursor:pointer;transition:.2s var(--e)}
+.links a:hover,.links button:hover{border-color:var(--ac);transform:translateY(-4px);box-shadow:0 8px 24px var(--gl)}
+footer{text-align:center;padding:50px 20px 90px;color:var(--mu)}
+
+/* ===== TOAST, TERMINAL, CONFETTI ===== */
+#toasts{position:fixed;top:calc(env(safe-area-inset-top,0px) + 64px);right:14px;z-index:80;display:grid;gap:8px;max-width:min(340px,90vw)}
+.toast{background:var(--tx);color:var(--bg);padding:12px 16px;border-radius:12px;font-weight:600;font-size:.9rem;animation:ti .4s var(--e);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+@keyframes ti{from{opacity:0;transform:translateX(40px)}}
+#term{position:fixed;inset:auto 12px calc(12px + env(safe-area-inset-bottom,0px));max-width:620px;margin:auto;z-index:90;background:#05060d;color:#7cf5c8;font:500 .85rem var(--m);border:1px solid #7cf5c8;border-radius:14px;padding:14px;display:none}
+#term.open{display:block}
+#tout{max-height:200px;overflow:auto;white-space:pre-wrap;margin-bottom:8px}
+#tin{width:100%;background:transparent;border:0;color:inherit;font:inherit;outline:0}
+#cv{position:fixed;inset:0;pointer-events:none;z-index:95}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="sr" href="#about">Skip to content</a>
+<header id="hud">
+  <strong>🎮 PLAYER ONE</strong>
+  <nav aria-label="Main"><a href="#about">Profile</a><a href="#stats">Stats</a><a href="#loot-s">Loot</a><a href="#game">Game</a><a href="#contact">Contact</a></nav>
+  <div class="meter" role="status" aria-live="polite"><span>🔎 <span id="mc">0</span>/<span id="mt">11</span></span><div class="bar"><i id="mb"></i></div>
+    <button class="ic" id="snd" aria-label="Toggle sound (off)" title="Sound">🔇</button>
+    <button class="ic" id="thm" aria-label="Toggle light or dark theme" title="Theme">🌗</button></div>
+</header>
+
+<main>
+<section id="hero">
+  <p class="tag" id="greet">&gt; booting profile…</p>
+  <h1><span id="type"></span><span class="cur">&nbsp;</span></h1>
+  <p class="sub">Scroll, click, flip and poke things. There are <b>11 secrets</b> hidden here. How many can you find?</p>
+  <div class="row"><button class="btn pulse" id="start">▶ Press START</button><button class="btn ghost" id="hint">💡 Need a hint?</button></div>
+</section>
+
+<section id="about">
+  <h2>Player Card</h2><p class="sub">Tilt the photo. Click it a few times. See what happens.</p>
+  <div class="grid2">
+    <div id="photoWrap"><div id="photo" tabindex="0" role="button" aria-label="Profile photo. Click it five times for a secret."></div></div>
+    <div class="card">
+      <h3 id="nm" style="font-size:1.8rem"></h3>
+      <p id="bio" style="margin-top:8px"></p>
+      <div class="facts" id="facts"></div>
+      <p style="margin-top:14px;font:500 .8rem var(--m);color:var(--mu)">🕒 Local time: <span id="clk"></span> · On page: <span id="vt">0s</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="stats">
+  <h2>Stats</h2><p class="sub">Hover (or tab to) a bar for the story behind it.</p>
+  <div class="card" id="statbox"></div>
+</section>
+
+<section id="loot-s">
+  <h2>Loot Cards</h2><p class="sub">Tap a card to flip it. Each one is a discovery. 🔎</p>
+  <div id="loot"></div>
+</section>
+
+<section id="game">
+  <h2>Two Truths &amp; a Lie</h2><p class="sub">Which one is the lie? Choose wisely.</p>
+  <div class="card"><div id="opts"></div><p id="res" aria-live="polite"></p><button class="btn ghost" id="again" style="display:none">↻ Play again</button></div>
+</section>
+
+<section id="journey">
+  <h2>Journey</h2><p class="sub">Past → Present → Future</p>
+  <div class="tl" id="tl"></div>
+</section>
+
+<section id="contact">
+  <h2>Connect</h2><p class="sub">Say hi. I reply faster than my 45-second timer.</p>
+  <div class="links" id="links"></div>
+</section>
+</main>
+<footer><p id="foot"></p><p style="font:500 .75rem var(--m);margin-top:8px">Psst… try pressing ~</p></footer>
+
+<div id="ring" aria-label="45 second challenge timer"><svg viewBox="0 0 64 64"><circle class="t" cx="32" cy="32" r="28"/><circle class="p" id="rp" cx="32" cy="32" r="28"/></svg><span id="rt">45</span></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="term" role="dialog" aria-label="Secret terminal"><div id="tout"></div><span>&gt; </span><input id="tin" autocomplete="off" aria-label="Terminal command"></div>
+<canvas id="cv"></canvas>
+
+<script>
+/* ============================================================
+   EDIT THIS CONFIG: replace the placeholders with your real info
+   ============================================================ */
+const C={
+  name:'Kemuel Gulane', nick:'Player One', photo:'',   // photo: 'assets/me.jpg' (leave '' for avatar)
+  tagline:'You have 45 seconds. Let’s make them count.',
+  bio:'Curious student who loves building things people actually enjoy using. I learn by breaking stuff, then fixing it. Currently leveling up in web development.',
+  facts:[['LOCATION','Cebu City, PH'],['COURSE','BSIT'],['FAV FOOD','Sushi'],['CLASS','Software Engineering'],['FAV COLOR','Purple'],['FAV GAME','Roblox']],
+  skills:[['HTML & CSS',90,'Built this whole page from scratch.'],['JavaScript',80,'Every effect here is hand-written. No libraries.'],['Problem Solving',85,'I debug by explaining the bug out loud.'],['Creativity',90,'I turned a résumé into a game.'],['Teamwork',82,'Group projects are better with snacks.'],['Coffee Tolerance',99,'Legendary. Do not test it.']],
+  loot:[['🎮','Gaming','Gaming taught me strategy, patience and rage-quit recovery.'],['🎧','Music','My playlist has 3 moods: focus, hype, and sad-but-vibing.'],['📸','Photography','I chase golden hour like it owes me money.'],['💻','Coding','First "Hello World" felt like casting a spell.'],['✈️','Travel','Next stop: anywhere with good food and a sunset.'],['🍜','Food','I will cross town for great noodles. No regrets.']],
+  truths:[['I can solve a Rubik’s cube in under a minute.',0],['I once coded for 12 hours straight.',0],['I have never eaten rice.',1]], // [text, isLie]
+  journey:[['PAST','Where it began','Wrote my first line of code and got hooked.'],['PRESENT','Leveling up','Studying, building projects and exploring HCI.'],['FUTURE','Next quest','Build products that make people smile.']],
+  links:[['✉️','Email','kemuelarised@gmail.com','mailto:kemuelarised@gmail.com'],['💻','GitHub','github.com/kemuul','https://github.com/kemuul'],['📘','Facebook','Kemuel Gulane','https://facebook.com/']],
+  quirk:'🥚 Secret fact: I name my files like characters in a game.'
+};
+
+/* ===== helpers ===== */
+const $=s=>document.querySelector(s), reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let soundOn=false, ac;
+function beep(f=660,d=.09){if(!soundOn)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='square';g.gain.value=.04;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),3800)}
+
+/* ===== discovery tracker (global state + HUD) ===== */
+const found=new Set(), TOTAL=11; $('#mt').textContent=TOTAL;
+function discover(id,msg){
+  if(found.has(id))return; found.add(id); beep(880,.12);
+  $('#mc').textContent=found.size; $('#mb').style.width=(found.size/TOTAL*100)+'%';
+  toast('🔎 '+msg+' ('+found.size+'/'+TOTAL+')');
+  $('#foot').textContent='You discovered '+found.size+'/'+TOTAL+' secrets. '+(found.size===TOTAL?'Completionist! 🏆':'Keep exploring!');
+  if(found.size===TOTAL){burst();toast('🏆 100% complete. Legend.')}
+}
+$('#foot').textContent='You discovered 0/'+TOTAL+' secrets.';
+
+/* ===== theme (saved, try/catch) ===== */
+try{const s=localStorage.getItem('theme');if(s)document.documentElement.dataset.theme=s}catch(e){}
+$('#thm').onclick=()=>{const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0b0d17';const n=dark?'light':'dark';r.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}beep(500)};
+$('#snd').onclick=e=>{soundOn=!soundOn;e.target.textContent=soundOn?'🔊':'🔇';e.target.setAttribute('aria-label','Toggle sound ('+(soundOn?'on':'off')+')');beep(700)};
+
+/* ===== hero: greeting + typewriter ===== */
+const hr=new Date().getHours();
+$('#greet').textContent='> '+(hr<12?'Good morning ☀️':hr<18?'Good afternoon 🌤️':'Good evening 🌙')+' · profile loaded';
+const line='Hi, I’m '+C.name+'. '+C.tagline; let ti=0;
+(function typeIt(){ $('#type').innerHTML=esc(line.slice(0,ti)).replace(C.name,'<span class="grad">'+esc(C.name)+'</span>'); if(ti++<line.length&&!reduce)setTimeout(typeIt,38); else if(reduce)$('#type').textContent=line })();
+document.title=C.name+' | Player One';
+$('#start').onclick=()=>{$('#about').scrollIntoView();beep(520)};
+$('#hint').onclick=()=>toast('Try: flip cards, click the photo 5×, type “hello”, press ~');
+
+/* ===== 45s challenge ring (non-blocking) + visit timer + clock ===== */
+let sec=0;
+setInterval(()=>{
+  sec++; $('#vt').textContent=sec+'s';
+  const left=Math.max(0,45-sec); $('#rt').textContent=left; $('#rp').style.strokeDashoffset=176*(sec/45>1?1:sec/45);
+  if(sec===45){toast('🎉 You survived 45 seconds! Achievement: Curious Human');burst();$('#rt').textContent='✔';toast(C.quirk)}
+  $('#clk').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+},1000); $('#clk').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+/* ===== player card ===== */
+$('#nm').innerHTML=esc(C.name)+' <small style="font:500 .9rem var(--m);color:var(--ac2)">aka '+esc(C.nick)+'</small>';
+$('#bio').textContent=C.bio;
+$('#facts').innerHTML=C.facts.map(f=>'<div><b>'+f[0]+'</b>'+esc(f[1])+'</div>').join('');
+const ph=$('#photo');
+ph.innerHTML=(C.photo?'<img src="'+C.photo+'" alt="Photo of '+esc(C.name)+'" loading="lazy">':
+ '<svg viewBox="0 0 300 300" role="img" aria-label="Avatar placeholder"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7cf5c8"/><stop offset="1" stop-color="#ff6bd6"/></linearGradient></defs><rect width="300" height="300" fill="url(#g)"/><circle cx="150" cy="115" r="55" fill="#0b0d17"/><path d="M45 300c0-70 45-110 105-110s105 40 105 110z" fill="#0b0d17"/></svg>')+'<span class="badge">ONLINE</span>';
+// 3D tilt (pointer events work for mouse + touch)
+ph.addEventListener('pointermove',e=>{if(reduce)return;const r=ph.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ph.style.transform='rotateY('+x*22+'deg) rotateX('+-y*22+'deg)'});
+ph.addEventListener('pointerleave',()=>ph.style.transform='');
+// click photo 5x easter egg
+let pc=0; const pclick=()=>{pc++;beep(300+pc*100,.06);if(pc===5){discover('photo','Easter egg: Photo Poker!');burst()}};
+ph.onclick=pclick; ph.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pclick()}};
+
+/* ===== skills ===== */
+$('#statbox').innerHTML=C.skills.map(s=>'<div class="stat" tabindex="0"><label><span>'+esc(s[0])+'</span><span>LV '+s[1]+'</span></label><div class="track"><div class="fill" style="--v:'+s[1]/100+'"></div></div><div class="tip" role="tooltip">'+esc(s[2])+'</div></div>').join('');
+
+/* ===== loot cards ===== */
+$('#loot').innerHTML=C.loot.map((l,i)=>'<button class="flip" aria-pressed="false" aria-label="'+l[1]+' card, click to flip"><div><span class="f"><span>'+l[0]+'</span><b>'+l[1]+'</b><small>CLICK ME</small></span><span class="k"><b>'+l[1]+'</b>'+esc(l[2])+'</span></div></button>').join('');
+document.querySelectorAll('.flip').forEach((b,i)=>b.onclick=()=>{b.classList.toggle('on');b.setAttribute('aria-pressed',b.classList.contains('on'));discover('card'+i,'Unlocked: '+C.loot[i][1])});
+
+/* ===== two truths and a lie ===== */
+function playRound(){
+  const arr=[...C.truths].sort(()=>Math.random()-.5); $('#res').textContent=''; $('#again').style.display='none';
+  $('#opts').innerHTML=arr.map((t,i)=>'<button class="opt" data-l="'+t[1]+'">'+(i+1)+'. '+esc(t[0])+'</button>').join('');
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const win=b.dataset.l==='1';
+    document.querySelectorAll('.opt').forEach(o=>{o.disabled=true;o.classList.add(o.dataset.l==='1'?'ok':'no')});
+    $('#res').textContent=win?'🎯 Correct! You spotted the lie. Sharp eyes.':'😂 Nope! That one was true. Better luck next round.';
+    if(win)burst(); else beep(180,.2);
+    $('#again').style.display='inline-block'; discover('game','Mini-game played!');
+  });
+}
+$('#again').onclick=playRound; playRound();
+
+/* ===== journey & contact ===== */
+$('#tl').innerHTML=C.journey.map(j=>'<div class="ch"><small>'+j[0]+'</small><h3>'+esc(j[1])+'</h3><p>'+esc(j[2])+'</p></div>').join('');
+$('#links').innerHTML=C.links.map(l=>'<a href="'+l[3]+'" target="_blank" rel="noopener">'+l[0]+' '+esc(l[1])+'</a>').join('')+'<button id="cp">📋 Copy email</button>';
+$('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(C.links[0][2]);toast('✅ Copied!')}catch(e){toast('Email: '+C.links[0][2])}};
+
+/* ===== scroll reveal (IntersectionObserver) ===== */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.25});
+document.querySelectorAll('.stat,.ch').forEach(el=>io.observe(el));
+
+/* ===== cursor glow (non-touch only) ===== */
+if(matchMedia('(hover:hover)').matches)addEventListener('pointermove',e=>{document.body.style.setProperty('--mx',e.clientX+'px');document.body.style.setProperty('--my',e.clientY+'px')});
+
+/* ===== confetti (custom canvas) ===== */
+const cv=$('#cv'),cx=cv.getContext('2d');let ps=[];
+function size(){cv.width=innerWidth;cv.height=innerHeight} size(); addEventListener('resize',size);
+function burst(){if(reduce)return;const cs=['#7cf5c8','#ff6bd6','#ffd93d','#6bb5ff'];for(let i=0;i<140;i++)ps.push({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*16,vy:Math.random()*-14-2,s:Math.random()*8+4,c:cs[i%4],l:100});if(ps.length===140)loop()}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.l--;cx.fillStyle=p.c;cx.fillRect(p.x,p.y,p.s,p.s)});ps=ps.filter(p=>p.l>0);if(ps.length)requestAnimationFrame(loop);else cx.clearRect(0,0,cv.width,cv.height)}
+
+/* ===== easter eggs: Konami, "hello", terminal ===== */
+const kon=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let ki=0,buf='';
+const tin=$('#tin'),tout=$('#tout'),term=$('#term');
+function say(t){tout.textContent+=t+'\n';tout.scrollTop=tout.scrollHeight}
+const cmds={help:()=>'Commands: help, about, skills, joke, secret, clear, exit',about:()=>C.name+': '+C.bio,skills:()=>C.skills.map(s=>s[0]+' '+s[1]).join('\n'),
+ joke:()=>['Why do programmers prefer dark mode? Light attracts bugs.','There are 10 kinds of people: those who get binary and those who don’t.'][Math.random()*2|0],
+ secret:()=>C.quirk,clear:()=>{tout.textContent='';return ''},exit:()=>{term.classList.remove('open');return ''}};
+tin.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape'){term.classList.remove('open');return}
+ if(e.key==='Enter'){const c=tin.value.trim().toLowerCase();say('> '+c);const r=cmds[c];say(r?r():'Unknown command. Type help.');tin.value=''}});
+addEventListener('keydown',e=>{
+  if(e.target===tin)return;
+  if(e.key==='`'||e.key==='~'){term.classList.add('open');tin.focus();if(!tout.textContent)say('Secret terminal online. Type help.');discover('term','Hacker mode: terminal found!');return}
+  ki=(e.key===kon[ki]||e.key.toLowerCase()===kon[ki])?ki+1:0; if(ki===kon.length){ki=0;discover('konami','Konami code!');burst();document.documentElement.style.setProperty('--ac','#ffd93d');setTimeout(()=>document.documentElement.style.removeProperty('--ac'),5000)}
+  if(e.key.length===1){buf=(buf+e.key.toLowerCase()).slice(-5);if(buf==='hello'){discover('hello','You said hello! Hi back 👋');burst()}}
+});
+</script>
+</body>
+</html>
